@@ -41,7 +41,7 @@
   :group 'hyde)
 
 
-(defcustom hyde-posts-dir 
+(defcustom hyde-posts-dir
   "_posts"
   "Directory which contains the list of posts"
   :type 'string
@@ -168,7 +168,7 @@
   "Commits the changes in the repository"
   (interactive "d\nMCommit message : ")
   (let* (
-         (post-file-name (nth 
+         (post-file-name (nth
                           1
                           (split-string (strip-string (thing-at-point 'line)) " : ")))
          (dir (get-text-property pos 'dir))
@@ -194,16 +194,16 @@
   "Deploys the generated website (should be run after hyde/run-jekyll"
   (interactive)
   (shell-command (format "cd %s && %s" (expand-file-name hyde-home) hyde/deploy-command)))
-  
-  
+
+
 ;; Utility functions
 (defun hyde/hyde-file-local-unsaved-changed (dir file)
   "Returns true if and only if the given file contains unsaved changes"
     (let (
-	(buffer (get-file-buffer file))
-	)
+        (buffer (get-file-buffer file))
+        )
     (if buffer
-	(buffer-modified-p buffer)
+        (buffer-modified-p buffer)
       nil)))
 
 (defun strip-string (str)
@@ -223,7 +223,7 @@ Status indicators are as follows:
 C Committed but not yet pushed
 M Local saved changes (uncommitted)
 E Local unsaved changes"
-  (or 
+  (or
    (and (hyde/hyde-file-local-unsaved-changed dir file) "E")
    (and (hyde/hyde-file-local-uncommitted-changed dir file) "M")
    (and (hyde/hyde-file-committed-not-pushed dir file) "C")
@@ -251,22 +251,22 @@ user"
                                 "/"
                                 (match-string-no-properties 2))))
         assets))))
-  
+
 (defun hyde/promote-to-post (pos)
   "Promotes the post under the cursor from a draft to a post"
   (interactive "d")
   (let (
-	(post-file-name (nth 
-			 1
-			 (split-string (strip-string (thing-at-point 'line)) " : ")))
-	(dir (get-text-property pos 'dir)))
+        (post-file-name (nth
+                         1
+                         (split-string (strip-string (thing-at-point 'line)) " : ")))
+        (dir (get-text-property pos 'dir)))
     (if (equal dir hyde-drafts-dir)
         (progn
           ;; Move over post assets
           (dolist (asset (hyde/hyde-get-post-assets (concat dir "/" post-file-name)))
             (progn
               (message (concat "Asset is : " asset))
-              (hyde/hyde-rename-file asset 
+              (hyde/hyde-rename-file asset
                                      (format "%s%s" hyde-home
                                              (replace-regexp-in-string "_drafts" "" asset)))))
           ;; Move over the actual post
@@ -282,12 +282,12 @@ user"
   "Opens the post under cursor in the editor"
   (interactive "d")
   (let (
-	(post-file-name (nth 
-			 1
-			 (split-string (strip-string (thing-at-point 'line)) " : ")))
-	(dir (get-text-property pos 'dir)))
+        (post-file-name (nth
+                         1
+                         (split-string (strip-string (thing-at-point 'line)) " : ")))
+        (dir (get-text-property pos 'dir)))
     (let ((hyde-buffer (current-buffer)))
-      (find-file 
+      (find-file
        (strip-string (concat hyde-home "/" dir "/" post-file-name)))
       (hyde-markdown-activate-mode hyde-buffer))))
 
@@ -295,8 +295,8 @@ user"
 (defun hyde/new-post (title)
   "Creates a new post"
   (interactive "MEnter post title: ")
-  (let ((post-file-name (expand-file-name (format "%s/%s/%s.markdown" 
-                                                  hyde-home hyde-drafts-dir (concat 
+  (let ((post-file-name (expand-file-name (format "%s/%s/%s.markdown"
+                                                  hyde-home hyde-drafts-dir (concat
                                                                              (format-time-string "%Y-%m-%d-")
                                                                              (downcase (replace-regexp-in-string " " "_" title))))))
         (hyde-buffer (current-buffer)))
@@ -322,7 +322,7 @@ user"
 
 ;; Keymaps
 (defvar hyde-mode-map
-  (let 
+  (let
       ((hyde-mode-map (make-sparse-keymap)))
     (define-key hyde-mode-map (kbd "n") 'hyde/new-post)
     (define-key hyde-mode-map (kbd "g") 'hyde/load-posts)
@@ -362,17 +362,17 @@ user"
   (insert ":: Editing blog at:" hyde-home "\n")
   (insert ":: Posts\n")
   ;; Insert posts from posts directory
-  (let 
+  (let
       ((posts (hyde/list-format-posts hyde-posts-dir)))
     (dolist (post posts)
       (progn
-	(save-excursion
-	  (insert (concat post "\n")))
-	(put-text-property (point) (+ (point) (length post)) 'dir hyde-posts-dir)
-	(forward-line))))
+        (save-excursion
+          (insert (concat post "\n")))
+        (put-text-property (point) (+ (point) (length post)) 'dir hyde-posts-dir)
+        (forward-line))))
   ;; Inserts post for the drafts directory
   (insert "\n:: Drafts\n")
-  (let 
+  (let
       ((posts (hyde/list-format-posts hyde-drafts-dir)))
     (dolist (post posts)
       (progn
@@ -388,14 +388,14 @@ user"
 (defun hyde/read-config (hyde-home)
   "Loads up the config file to set the blog deployment and other information"
   (let (
-	(config-file (concat hyde-home "/.hyde.el"))
-	)
+        (config-file (concat hyde-home "/.hyde.el"))
+        )
     (if (not (file-exists-p config-file))
         (error (format "Config file '%s' is missing. Won't continue" config-file)))
     (message (format "Loading %s" config-file))
     (load-file config-file)
     ))
-  
+
 (defun hyde/setup-directories (home)
   "Create expected directories if they don't exist"
   (let
@@ -411,18 +411,18 @@ user"
 \\{hyde-mode-map}"
   (kill-all-local-variables)
   (dolist (x '(hyde-deploy-dir
-	       hyde-posts-dir
-	       hyde-drafts-dir
-	       hyde/jekyll-command
-	       hyde/deploy-command
-	       hyde/git/remote
-	       hyde/git/remote-branch))
+               hyde-posts-dir
+               hyde-drafts-dir
+               hyde/jekyll-command
+               hyde/deploy-command
+               hyde/git/remote
+               hyde/git/remote-branch))
     (make-variable-buffer-local x))
   (set (make-local-variable 'hyde-home) home)
   (use-local-map hyde-mode-map)
   (set (make-local-variable 'font-lock-defaults) '(hyde-font-lock-keywords))
   (setq major-mode 'hyde/hyde-mode
-	mode-name "Hyde"
+        mode-name "Hyde"
         default-directory home)
   (hyde/read-config hyde-home)
   (hyde/setup-directories hyde-home)
@@ -430,7 +430,7 @@ user"
   (hl-line-mode t)
   ;; Create directories for images
   (let ((draft-images-dir (concat hyde-home hyde-drafts-dir "/" hyde-images-dir))
-        (posts-images-dir (concat hyde-home "/" hyde-images-dir)))
+        (posts-images-dir (concat hyde-home hyde-images-dir)))
     (progn
       (message (concat "Drafts image dir :"draft-images-dir))
       (message (concat "Posts image dir :"posts-images-dir))
@@ -446,8 +446,8 @@ user"
   "Enters hyde mode"
   (interactive "DBlog : ")
   (let (
-	(hyde-buffer (concat "*Hyde : " home "*"))
-	)
+        (hyde-buffer (concat "*Hyde : " home "*"))
+        )
     (switch-to-buffer (get-buffer-create hyde-buffer)))
   (hyde/hyde-mode home))
 
