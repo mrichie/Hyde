@@ -88,7 +88,7 @@ sDescription: ")
 
 (define-derived-mode hyde-markdown-mode  markdown-mode "Hyde-markdown" 
   "Markdown mode with a few extra bindings for convenience" 
-  (define-key hyde-markdown-mode-map (kbd "C-c C-c") 'hyde-markdown-end-edit)
+;;  (define-key hyde-markdown-mode-map (kbd "C-c C-c") 'hyde-markdown-end-edit)
   (define-key hyde-markdown-mode-map (kbd "C-c C-i") 'hyde-markdown-insert-image))
 
 (defun hyde-markdown-activate-mode (hyde-buffer)
