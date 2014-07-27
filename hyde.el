@@ -1,4 +1,5 @@
-;;; hyde.el --- ???
+;;; hyde.el --- Major mode to help create and manage Jekyll blogs
+
 ;; Copyright (C) 2004 Noufal Ibrahim <noufal at nibrahim.net.in>
 ;;
 ;; This program is not part of Gnu Emacs
@@ -65,6 +66,14 @@
   "Command to run jekyll to create the blog"
   :type 'string
   :group 'hyde)
+
+(defcustom hyde/serve-command
+  "jekyll serve"
+  "Command to serve jekyll to the localhost"
+  :type 'string
+  :group 'hyde)
+
+(defvar hyde/serve-process nil "Process to keep track of serve")
 
 (defcustom hyde/deploy-command
   "rsync -vr _site/* nkv@ssh.hcoop.net:/afs/hcoop.net/user/n/nk/nkv/public_html/nibrahim.net.in/"
@@ -190,6 +199,22 @@
   (interactive)
   (shell-command (format "cd %s && %s" (expand-file-name hyde-home) hyde/jekyll-command)))
 
+(defun hyde/stop-serve ()
+  "Stops jekyll serve if running"
+  (interactive)
+  (when hyde/serve-process
+    (delete-process hyde/serve-process)
+    (setq hyde/serve-process nil)))
+
+(defun hyde/serve ()
+  "Serves jekyll to localhost in an asynchronous process. If
+already started, stops and restarts."
+  (interactive)
+  (hyde/stop-serve)
+  (setq hyde/serve-process
+   (start-process-shell-command "hyde/serve" "*hyde/serve*"
+    (format "cd %s && %s" (expand-file-name hyde-home) hyde/serve-command))))
+
 (defun hyde/deploy ()
   "Deploys the generated website (should be run after hyde/run-jekyll"
   (interactive)
@@ -236,7 +261,7 @@ properly and returns them so that they can be presented to the
 user"
   (let* (
          (posts-dir (concat (expand-file-name hyde-home) "/" dir))
-         (posts (directory-files posts-dir nil ".*markdown" nil)))
+         (posts (directory-files posts-dir nil ".*md\\|.*markdown" nil)))
     (map 'list (lambda (f) (format "%s : %s" (hyde/file-status dir f) f)) posts)))
 
 (defun hyde/hyde-get-post-assets (post)
@@ -329,6 +354,8 @@ user"
     (define-key hyde-mode-map (kbd "c") 'hyde/hyde-commit-post)
     (define-key hyde-mode-map (kbd "P") 'hyde/hyde-push)
     (define-key hyde-mode-map (kbd "j") 'hyde/run-jekyll)
+    (define-key hyde-mode-map (kbd "s") 'hyde/serve)
+    (define-key hyde-mode-map (kbd "k") 'hyde/stop-serve)
     (define-key hyde-mode-map (kbd "d") 'hyde/deploy)
     (define-key hyde-mode-map (kbd "p") 'hyde/promote-to-post)
     (define-key hyde-mode-map (kbd "q") 'hyde/quit)
@@ -347,6 +374,9 @@ user"
     "---"
     ["Refresh" hyde/load-posts t]
     ["Run Jekyll" hyde/run-jekyll t]
+    ["(Re)start server" hyde/serve t]
+    ["Stop server" hyde/stop-serve t]
+    "---"
     ["Deploy" hyde/deploy t]
     ["Push" hyde/hyde-push t]
     ["Quit" hyde/quit t]
@@ -452,3 +482,5 @@ user"
   (hyde/hyde-mode home))
 
 (provide 'hyde)
+
+;;; hyde.el ends here
